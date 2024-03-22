@@ -9,7 +9,7 @@ A continuación construir la imagen *Oracla Database 19.3.0 Standard Edition 2*:
 ```sh
 cd ./OracleDatabase/SingleInstance/dockerfiles
 
-./buildContainerImage.sh -v 19.3.0 -s
+./buildContainerImage.sh -v 19.3.0 -e
 ```
 
 ## Ejecutar el contenedor Oracle
@@ -20,11 +20,11 @@ Ejecutar el siguiente comando. Se ejecuta el contenedor y se queda en modo inter
 docker run --name oracle19c \
 	-p 1521:1521 -p 5500:5500 -p 2484:2484 \
 	--ulimit nofile=1024:65536 --ulimit nproc=2047:16384 --ulimit stack=10485760:33554432 --ulimit memlock=3221225472 \
-	-e ORACLE_EDITION=standard \
+	-e ORACLE_EDITION=enterprise \
 	-e ORACLE_CHARACTERSET=WE8ISO8859P15 \
-	-e ORACLE_PWD=Oracle2024 \
+	-e ORACLE_PWD=Octubre20 \
 	--restart always \
-	oracle/database:19.3.0-se2
+	oracle/database:19.3.0-ee
 ```
 
 Si se desea externalizar la carpeta con los ficheros físicos de la base de datos, crear una carpeta por ejemplo en `/opt/oracle/oradata` , darle permisos totales de escritura, y montar la carpeta como volumen adicional al contenedor:
@@ -36,21 +36,25 @@ sudo chmod -R 777 /opt/oracle/oradata
 docker run --name oracle19c \
 	-p 1521:1521 -p 5500:5500 -p 2484:2484 \
 	--ulimit nofile=1024:65536 --ulimit nproc=2047:16384 --ulimit stack=10485760:33554432 --ulimit memlock=3221225472 \
-	-e ORACLE_EDITION=standard \
+	-e ORACLE_EDITION=enterprise \
 	-e ORACLE_CHARACTERSET=WE8ISO8859P15 \
-	-e ORACLE_PWD=Oracle2024 \
+	-e ORACLE_PWD=Octubre20 \
     -v /opt/oracle/oradata:/opt/oracle/oradata \
 	--restart always \
-	oracle/database:19.3.0-se2
+	oracle/database:19.3.0-ee
 ```
 
-> Nota: Si es la primera vez que se ejecuta el contenedor, se tiene que montar y levantar la base de datos, y el proceso puede tardar unos 20 minutos. En la consola del contenedor se puede ver el progreso. Las siguientes veces solo es levantar la instancia y solo dura unos segundos.
+> Nota: Para dejar el contenedor en segundo plano, añadir la opción `-d` en la instrucción `docker run` anterior.
+
+> Nota 2: Si es la primera vez que se ejecuta el contenedor, se tiene que montar y levantar la base de datos, y el proceso puede tardar unos 20 minutos. En la consola del contenedor se puede ver el progreso. Las siguientes veces solo es levantar la instancia y solo dura unos segundos.
 
 ## Importación de datos de la Plataforma de Rendición de Cuentas Locales
 
 1. Copiar los ficheros de importación a la carpeta `/opt/oracle/admin/ORCLCDB/dpdump/` del contenedor.
 
 ```sh
+docker exec -it oracle19c mkdir -p /opt/oracle/admin/ORCLCDB/dpdump/
+
 docker cp /mnt/c/Users/Benito/Downloads/TBC2_EXP_TCUV2_11032024.dpexp oracle19c:/opt/oracle/admin/ORCLCDB/dpdump/TBC2_EXP_TCUV2.dpexp
 docker cp /mnt/c/Users/Benito/Downloads/TBC2_EXP_SCICA_11032024.dpexp oracle19c:/opt/oracle/admin/ORCLCDB/dpdump/TBC2_EXP_SCICA.dpexp
 ```
@@ -68,7 +72,7 @@ docker exec -it oracle19c bash
 Ejecutamos sqlplus como SYS:
 
 ```sh
-sqlplus SYS/Oracle2024 AS SYSDBA
+sqlplus SYS/Octubre20 AS SYSDBA
 ```
 
 Y creamos los objetos:
@@ -78,22 +82,22 @@ alter session set "_ORACLE_SCRIPT"=true;
 
 CREATE TABLESPACE TS_EXP_TCUV2
 DATAFILE 'ts_exp_tcuv2.dat' 
-SIZE 9000M
+SIZE 1000M
 ONLINE;
 
-alter database datafile '/opt/oracle/product/19c/dbhome_1/dbs/ts_exp_tcuv2.dat' autoextend on next 50m maxsize unlimited;
+alter database datafile '/opt/oracle/product/19c/dbhome_1/dbs/ts_exp_tcuv2.dat' autoextend on next 1000m maxsize unlimited;
 
-CREATE USER REXP_SCICA IDENTIFIED BY password;
+CREATE USER REXP_SCICA IDENTIFIED BY REXP_SCICA;
 ALTER USER "REXP_SCICA" DEFAULT ROLE ALL;
 grant all privileges to REXP_SCICA;
 ALTER USER REXP_SCICA DEFAULT TABLESPACE TS_EXP_TCUV2;
 
-CREATE USER EXP_TCUV2 IDENTIFIED BY password;
+CREATE USER EXP_TCUV2 IDENTIFIED BY EXP_TCUV2;
 ALTER USER "EXP_TCUV2" DEFAULT ROLE ALL;
 grant all privileges to EXP_TCUV2;
 ALTER USER EXP_TCUV2 DEFAULT TABLESPACE TS_EXP_TCUV2;
 
-CREATE USER REXP_TCU IDENTIFIED BY password;
+CREATE USER REXP_TCU IDENTIFIED BY REXP_TCU;
 ALTER USER "REXP_TCU" DEFAULT ROLE ALL;
 grant all privileges to REXP_TCU;
 ALTER USER REXP_TCU DEFAULT TABLESPACE TS_EXP_TCUV2;
@@ -114,9 +118,9 @@ Importamos los datos:
 ```sh
 export NLS_LANG=SPANISH_SPAIN.WE8ISO8859P15
 
-impdp \"SYS/Oracle2024 AS SYSDBA\" directory=DATA_PUMP_DIR dumpfile=TBC2_EXP_TCUV2.dpexp remap_tablespace=TCUV2_MV:TS_EXP_TCUV2 CONTENT=all TABLE_EXISTS_ACTION=REPLACE
+impdp \"SYS/Octubre20 AS SYSDBA\" directory=DATA_PUMP_DIR dumpfile=TBC2_EXP_TCUV2.dpexp remap_tablespace=TCUV2_MV:TS_EXP_TCUV2 CONTENT=all TABLE_EXISTS_ACTION=REPLACE
 
-impdp \"SYS/Oracle2024 AS SYSDBA\" directory=DATA_PUMP_DIR dumpfile=TBC2_EXP_SCICA.dpexp remap_tablespace=TS_EXP:TS_EXP_TCUV2 remap_schema=EXP_SCICA:EXP_TCUV2 CONTENT=all TABLE_EXISTS_ACTION=REPLACE
+impdp \"SYS/Octubre20 AS SYSDBA\" directory=DATA_PUMP_DIR dumpfile=TBC2_EXP_SCICA.dpexp remap_tablespace=TS_EXP:TS_EXP_TCUV2 remap_schema=EXP_SCICA:EXP_TCUV2 CONTENT=all TABLE_EXISTS_ACTION=REPLACE
 
 exit
 ```
