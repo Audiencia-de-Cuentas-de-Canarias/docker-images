@@ -23,6 +23,7 @@ docker run --name oracle19c \
 	-e ORACLE_EDITION=standard \
 	-e ORACLE_CHARACTERSET=WE8ISO8859P15 \
 	-e ORACLE_PWD=Oracle2024 \
+	--restart always \
 	oracle/database:19.3.0-se2
 ```
 
@@ -39,6 +40,7 @@ docker run --name oracle19c \
 	-e ORACLE_CHARACTERSET=WE8ISO8859P15 \
 	-e ORACLE_PWD=Oracle2024 \
     -v /opt/oracle/oradata:/opt/oracle/oradata \
+	--restart always \
 	oracle/database:19.3.0-se2
 ```
 
