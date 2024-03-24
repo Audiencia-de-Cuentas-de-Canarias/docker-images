@@ -17,7 +17,7 @@ cd ./OracleDatabase/SingleInstance/dockerfiles
 Ejecutar el siguiente comando. Se ejecuta el contenedor y se queda en modo interactivo para ver el log en consola y poder cerrarlo ordenadamente si se desea con CTRL+C.
 
 ```sh
-docker run --name oracle19c \
+docker run -d --name oracle19c \
 	-p 1521:1521 -p 5500:5500 -p 2484:2484 \
 	--ulimit nofile=1024:65536 --ulimit nproc=2047:16384 --ulimit stack=10485760:33554432 --ulimit memlock=3221225472 \
 	-e ORACLE_EDITION=enterprise \
@@ -33,7 +33,7 @@ Si se desea externalizar la carpeta con los ficheros físicos de la base de dato
 sudo mkdir -p /opt/oracle/oradata
 sudo chmod -R 777 /opt/oracle/oradata
 
-docker run --name oracle19c \
+docker run -d --name oracle19c \
 	-p 1521:1521 -p 5500:5500 -p 2484:2484 \
 	--ulimit nofile=1024:65536 --ulimit nproc=2047:16384 --ulimit stack=10485760:33554432 --ulimit memlock=3221225472 \
 	-e ORACLE_EDITION=enterprise \
@@ -44,9 +44,13 @@ docker run --name oracle19c \
 	oracle/database:19.3.0-ee
 ```
 
-> Nota: Para dejar el contenedor en segundo plano, añadir la opción `-d` en la instrucción `docker run` anterior.
+> Nota: Si es la primera vez que se ejecuta el contenedor, se tiene que montar y levantar la base de datos, y el proceso puede tardar unos 20 minutos. En la consola del contenedor se puede ver el progreso. Las siguientes veces solo es levantar la instancia y solo dura unos segundos.
 
-> Nota 2: Si es la primera vez que se ejecuta el contenedor, se tiene que montar y levantar la base de datos, y el proceso puede tardar unos 20 minutos. En la consola del contenedor se puede ver el progreso. Las siguientes veces solo es levantar la instancia y solo dura unos segundos.
+Una vez ejecutado el contenedor, se puede acceder a los logs con el comando:
+
+```sh
+docker logs -f oracle19c
+```
 
 ## Importación de datos de la Plataforma de Rendición de Cuentas Locales
 
