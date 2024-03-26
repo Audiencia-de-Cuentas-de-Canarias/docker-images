@@ -84,10 +84,7 @@ Y creamos los objetos:
 ```sql
 alter session set "_ORACLE_SCRIPT"=true;
 
-CREATE TABLESPACE TS_EXP_TCUV2
-DATAFILE 'ts_exp_tcuv2.dat' 
-SIZE 1000M
-ONLINE;
+CREATE TABLESPACE TS_EXP_TCUV2 DATAFILE 'ts_exp_tcuv2.dat' SIZE 1000M ONLINE;
 
 alter database datafile '/opt/oracle/product/19c/dbhome_1/dbs/ts_exp_tcuv2.dat' autoextend on next 1000m maxsize unlimited;
 
