@@ -54,7 +54,7 @@ docker logs -f oracle19c
 
 ## Importación de datos de la Plataforma de Rendición de Cuentas Locales
 
-1. Establecemos los objetos iniciales para la importación de los datos (tablespace y esquemas)
+**1. Establecemos los objetos iniciales para la importación de los datos (tablespace y esquemas)**
 
 Entramos al contenedor:
 
@@ -100,7 +100,7 @@ ALTER USER REXP_SCCLM DEFAULT TABLESPACE TS_EXP_TCUV2;
 quit
 ```
 
-2. Activamos la auditoria de Oracle
+**2. Activamos la auditoria de Oracle**
 
 Hay informes que hacen uso de tablas de auditoría como por ejemplo el informe `RENDICION_SEMANAL.xlsx` hace uso de la tabla `AUDSYS.UNIFIED_AUDIT_TRAIL` para consultar la fecha de la última carga de datos. Por defecto Oracle no viene con la Auditoria Unificada habilitada. Para habilitarla seguir estas intrucciones basadas en la información de este [enlace](https://www.oracle.com/webfolder/technetwork/tutorials/obe/db/12c/r1/security/sec_uni_audit/sec_uni_audit.html).
 
@@ -129,7 +129,7 @@ También se puede consultar directamente los datos de la auditoría:
 select * from AUDSYS.UNIFIED_AUDIT_TRAIL;
 ```
 
-3. Copiar los ficheros de importación a la carpeta `/opt/oracle/admin/ORCLCDB/dpdump/` del contenedor.
+**3. Copiar los ficheros de importación a la carpeta `/opt/oracle/admin/ORCLCDB/dpdump/` del contenedor.**
 
 ```sh
 docker exec -it oracle19c mkdir -p /opt/oracle/admin/ORCLCDB/dpdump/
@@ -140,7 +140,7 @@ docker cp /mnt/c/Users/Benito/Downloads/TBC2_EXP_SCICA_11032024.dpexp oracle19c:
 
 > Cambiar las rutas locales y nombre de los ficheros locales por los que procedan.
 
-4. Importamos los datos
+**4. Importamos los datos**
 
 Entramos al contenedor (si no estamos dentro ya):
 
