@@ -111,7 +111,36 @@ ALTER USER REXP_SCCLM DEFAULT TABLESPACE TS_EXP_TCUV2;
 quit
 ```
 
-3. Importamos los datos
+3. Activamos la auditoria de Oracle
+
+Hay informes que hacen uso de tablas de auditoría como por ejemplo el informe `RENDICION_SEMANAL.xlsx` hace uso de la tabla `AUDSYS.UNIFIED_AUDIT_TRAIL` para consultar la fecha de la última carga de datos. Por defecto Oracle no viene con la Auditoria Unificada habilitada. Para habilitarla seguir estas intrucciones basadas en la información de este [enlace](https://www.oracle.com/webfolder/technetwork/tutorials/obe/db/12c/r1/security/sec_uni_audit/sec_uni_audit.html).
+
+   - Entramos al contenedor de oracle
+   ```sh
+   docker exec -it oracle19c bash
+   ```
+   - Compilamos el módulo de Auditoría Unificada
+   ```sh
+   cd $ORACLE_HOME/rdbms/lib
+   make -f ins_rdbms.mk uniaud_on ioracle
+   exit
+   ```
+   - Reiniciamos el oracle (no elimina el contenedor, sino que lo para y vuelve a arrancar)
+   ```sh
+   docker stop oracle19c
+   docker start oracle19c
+   ```
+
+Podemos comprobar que está el módulo habilitado conectando con el usuario `SYSTEM` y ejecutando la consulta:
+```sql
+select * from v$option where PARAMETER = 'Unified Auditing';
+```
+También se puede consultar directamente los datos de la auditoría:
+```sql
+select * from AUDSYS.UNIFIED_AUDIT_TRAIL;
+```
+
+4. Importamos los datos
 
 Entramos al contenedor (si no estamos dentro ya):
 
