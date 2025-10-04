@@ -2,7 +2,11 @@
 
 ## Construir la imagen
 
-Descargar el fichero `LINUX.X64_193000_db_home.zip` (2.9 GB) de https://www.oracle.com/database/technologies/oracle-database-software-downloads.html#license-lightbox (fichero zip llamado "Oracle Database 19c for Linux x86-64") y colocarlo en `./OracleDatabase/SingleInstance/dockerfiles/19.3.0`.
+Primero descargar el fichero zip con la versión correcta de la base de datos:
+
+   - En **Linux** descargar el fichero `LINUX.X64_193000_db_home.zip` (2.8 GB) de https://www.oracle.com/database/technologies/oracle-database-software-downloads.html#license-lightbox (fichero zip llamado "Oracle Database 19c for Linux x86-64") y colocarlo en `./OracleDatabase/SingleInstance/dockerfiles/19.3.0`.
+
+   - En **Mac OSX** descargar el fichero `LINUX.ARM64_1919000_db_home.zip` (2.2 GB) de https://www.oracle.com/database/technologies/oracle-database-software-downloads.html#license-lightbox (fichero zip llamado "Oracle Database 19c for LINUX ARM (aarch64)") y colocarlo en `./OracleDatabase/SingleInstance/dockerfiles/19.3.0`.
 
 A continuación construir la imagen *Oracla Database 19.3.0 Standard Edition 2*:
 
